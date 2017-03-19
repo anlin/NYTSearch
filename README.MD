@@ -1,8 +1,8 @@
-##**NYTSearch**
+## NYTSearch
 
 **NYTSearch** is an android app that allows a user to search for articles on web using simple filters. The app utilizes [New York Times Search API](http://developer.nytimes.com/docs/read/article_search_api_v2).
 
-Time spent: **12.5** hours spent in total
+Time spent: **13.5** hours spent in total
 
 ## User Stories
 
@@ -22,12 +22,14 @@ The following **optional** features are implemented:
 
 * [ ] Implements robust error handling, [check if internet is available](http://guides.codepath.com/android/Sending-and-Managing-Network-Requests#checking-for-network-connectivity), handle error cases, network failures
 * [ ] Used the **ActionBar SearchView** or custom layout as the query box instead of an EditText
+* [ ] User can **share an article link** to their friends or email it to themselves
+* [ ] Replaced Filter Settings Activity with a lightweight modal overlay
 
 ## Video Walkthrough
 
 Here's a walkthrough of implemented user stories:
 
-<img src='http://i.imgur.com/A1Qdg6l.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+<img src='http://i.imgur.com/reg4agy.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
 
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
 

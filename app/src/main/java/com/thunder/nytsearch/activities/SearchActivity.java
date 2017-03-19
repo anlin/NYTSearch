@@ -102,6 +102,7 @@ public class SearchActivity extends AppCompatActivity implements FilterDialogFra
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
+                adapter.clear();
                 onArticleSearch(0);
                 searchView.clearFocus();
                 return true;
