@@ -1,22 +1,20 @@
 package com.thunder.nytsearch.activities;
 
-import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.support.annotation.BoolRes;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.Toast;
 
@@ -38,21 +36,19 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 import cz.msebera.android.httpclient.Header;
-import cz.msebera.android.httpclient.util.TextUtils;
 
 public class SearchActivity extends AppCompatActivity implements FilterDialogFragment.FilterDialogListener {
 
-    EditText etQuery;
-    Button btnSearch;
     GridView gvResults;
 
     Filter currentFilter;
 
     ArrayList<Article> articles;
     ArticleArrayAdapter adapter;
+
+    String query;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,8 +65,6 @@ public class SearchActivity extends AppCompatActivity implements FilterDialogFra
     }
 
     private void setupView() {
-        etQuery = (EditText) findViewById(R.id.etQuery);
-        btnSearch = (Button) findViewById(R.id.btnSearch);
         gvResults = (GridView) findViewById(R.id.gvResults);
         articles = new ArrayList<Article>();
         adapter = new ArticleArrayAdapter(this, articles);
@@ -97,21 +91,28 @@ public class SearchActivity extends AppCompatActivity implements FilterDialogFra
                 return true;
             }
         });
-
-        btnSearch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                adapter.clear();
-                onArticleSearch(0);
-            }
-        });
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_search, menu);
-        return true;
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                onArticleSearch(0);
+                searchView.clearFocus();
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -142,7 +143,6 @@ public class SearchActivity extends AppCompatActivity implements FilterDialogFra
             return;
         }
 
-        String query = etQuery.getText().toString();
         String url = "https://api.nytimes.com/svc/search/v2/articlesearch.json";
         AsyncHttpClient client = new AsyncHttpClient();
 
