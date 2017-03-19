@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <TextView
+        android:text="@string/filter_dialog_begin_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp"
+        android:id="@+id/tvBeginDateLabel" />
+
+    <TextView
+        tools:text="04/01/2017"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvBeginDateLabel"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/tvBeginDate" />
+
+    <TextView
+        android:text="@string/filter_dialog_sort_order"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvBeginDate"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp"
+        android:id="@+id/tvSortOrderLabel" />
+
+    <Spinner
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvSortOrderLabel"
+        android:entries="@array/orders_array"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
+        android:id="@+id/spSortOrder" />
+
+    <TextView
+        android:text="@string/filter_dialog_news_desk_values"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/spSortOrder"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp"
+        android:id="@+id/textView4" />
+
+    <CheckBox
+        android:text="@string/filter_dialog_arts"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView4"
+        android:layout_alignLeft="@+id/spSortOrder"
+        android:layout_alignRight="@+id/spSortOrder"
+        android:id="@+id/cbArts" />
+
+    <CheckBox
+        android:text="@string/filter_dialog_fashion_style"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/cbArts"
+        android:layout_alignLeft="@+id/spSortOrder"
+        android:layout_alignRight="@+id/spSortOrder"
+        android:id="@+id/cbFashionStyles" />
+
+    <CheckBox
+        android:text="@string/filter_dialog_sports"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/cbSports"
+        android:layout_below="@+id/cbFashionStyles"
+        android:layout_alignLeft="@+id/spSortOrder"
+        android:layout_alignRight="@+id/spSortOrder" />
+
+    <Button
+        android:text="@string/filter_dialog_btn_save"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnSave"
+        android:layout_below="@+id/cbSports"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="40dp" />
+
+</RelativeLayout>

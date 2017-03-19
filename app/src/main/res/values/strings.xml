@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">NYTSearch</string>
+    <string name="action_settings">Settings</string>
+    <string name="hint">Enter Search Query</string>
+    <string name="search">Search</string>
+    <string name="action_filter">Filter</string>
+    <string name="title_activity_article_activiy">ArticleActiviy</string>
+
+    <!-- Filter Dialog -->
+    <string name="filter_dialog_begin_date">Begin Date</string>
+    <string name="filter_dialog_sort_order">Sort Order</string>
+    <string name="filter_dialog_news_desk_values">News Desk Values</string>
+    <string name="filter_dialog_arts">Arts</string>
+    <string name="filter_dialog_fashion_style">Fashion &amp; Style</string>
+    <string name="filter_dialog_sports">Sports</string>
+    <string name="filter_dialog_btn_save">Save</string>
+
+</resources>
