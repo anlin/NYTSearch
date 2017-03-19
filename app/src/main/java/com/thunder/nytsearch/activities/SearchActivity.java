@@ -1,8 +1,12 @@
 package com.thunder.nytsearch.activities;
 
 import android.app.Fragment;
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.support.annotation.BoolRes;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -30,6 +34,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -132,6 +137,11 @@ public class SearchActivity extends AppCompatActivity implements FilterDialogFra
     }
 
     public void onArticleSearch(int offset) {
+        if(!isNetworkAvailable()||!isOnline()){
+            Toast.makeText(this, "The device is not online.", Toast.LENGTH_LONG).show();
+            return;
+        }
+
         String query = etQuery.getText().toString();
         String url = "https://api.nytimes.com/svc/search/v2/articlesearch.json";
         AsyncHttpClient client = new AsyncHttpClient();
@@ -190,5 +200,28 @@ public class SearchActivity extends AppCompatActivity implements FilterDialogFra
 
     public void loadNextDataFromApi(int offset){
         onArticleSearch(offset);
+    }
+
+    private Boolean isNetworkAvailable(){
+        ConnectivityManager connectivityManager = (ConnectivityManager)
+                getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        return networkInfo !=null && networkInfo.isConnectedOrConnecting();
+
+    }
+
+    private boolean isOnline(){
+        Runtime runtime = Runtime.getRuntime();
+        Process ipProcess = null;
+        try {
+            ipProcess = runtime.exec("system/bin/ping -c 1 8.8.8.8");
+            int exitValue = ipProcess.waitFor();
+            return (exitValue==0);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }

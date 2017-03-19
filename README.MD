@@ -1,4 +1,4 @@
-*NYTSearch*
+##*NYTSearch*
 
 **NYTSearch** is an android app that allows a user to search for articles on web using simple filters. The app utilizes [New York Times Search API](http://developer.nytimes.com/docs/read/article_search_api_v2).
 
@@ -17,6 +17,10 @@ The following **required** functionality is completed:
 * [ ] Subsequent searches have any filters applied to the search results
 * [ ] User can tap on any article in results to view the contents in an embedded browser.
 * [ ] User can **scroll down to see more articles**. The maximum number of articles is limited by the API search.
+
+The following **optional** features are implemented:
+
+* [ ] Implements robust error handling, [check if internet is available](http://guides.codepath.com/android/Sending-and-Managing-Network-Requests#checking-for-network-connectivity), handle error cases, network failures
 
 ## Video Walkthrough
 
