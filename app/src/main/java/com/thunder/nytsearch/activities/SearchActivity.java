@@ -8,7 +8,11 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -23,7 +27,9 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.thunder.nytsearch.R;
 import com.thunder.nytsearch.adapters.ArticleArrayAdapter;
+import com.thunder.nytsearch.adapters.EndlessRecyclerViewScrollListener;
 import com.thunder.nytsearch.adapters.EndlessScrollListener;
+import com.thunder.nytsearch.adapters.ItemClickSupport;
 import com.thunder.nytsearch.fragments.FilterDialogFragment;
 import com.thunder.nytsearch.models.Article;
 import com.thunder.nytsearch.models.Filter;
@@ -41,14 +47,14 @@ import cz.msebera.android.httpclient.Header;
 
 public class SearchActivity extends AppCompatActivity implements FilterDialogFragment.FilterDialogListener {
 
-    GridView gvResults;
+    RecyclerView rvArticles;
 
     Filter currentFilter;
 
     ArrayList<Article> articles;
     ArticleArrayAdapter adapter;
 
-    String query;
+    String mQuery;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,15 +71,21 @@ public class SearchActivity extends AppCompatActivity implements FilterDialogFra
     }
 
     private void setupView() {
-        gvResults = (GridView) findViewById(R.id.gvResults);
+        rvArticles = (RecyclerView) findViewById(R.id.rvArticles);
         articles = new ArrayList<Article>();
         adapter = new ArticleArrayAdapter(this, articles);
-        gvResults.setAdapter(adapter);
+        rvArticles.setAdapter(adapter);
 
-        // hook up listner for grid click
-        gvResults.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        StaggeredGridLayoutManager gridLayoutManager =
+                new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+
+        rvArticles.setItemAnimator(new DefaultItemAnimator());
+        rvArticles.setLayoutManager(gridLayoutManager);
+
+        // hook up listener for click
+        ItemClickSupport.addTo(rvArticles).setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemClicked(RecyclerView recyclerView, int position, View v) {
                 Intent intent = new Intent(getApplicationContext(), ArticleActiviy.class);
                 // get the article to display
                 Article article = articles.get(position);
@@ -84,11 +96,10 @@ public class SearchActivity extends AppCompatActivity implements FilterDialogFra
             }
         });
 
-        gvResults.setOnScrollListener(new EndlessScrollListener() {
+        rvArticles.addOnScrollListener(new EndlessRecyclerViewScrollListener(gridLayoutManager) {
             @Override
-            protected boolean onLoadMore(int page, int totalItemCount) {
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
                 loadNextDataFromApi(page);
-                return true;
             }
         });
     }
@@ -102,7 +113,8 @@ public class SearchActivity extends AppCompatActivity implements FilterDialogFra
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                adapter.clear();
+                mQuery = query;
+                articles.clear();
                 onArticleSearch(0);
                 searchView.clearFocus();
                 return true;
@@ -148,9 +160,9 @@ public class SearchActivity extends AppCompatActivity implements FilterDialogFra
         AsyncHttpClient client = new AsyncHttpClient();
 
         RequestParams params = new RequestParams();
-        params.put("api-key","YOUR_API_KEY");
+        params.put("api-key","YOUR_API_HERE");
         params.put("page", offset);
-        params.put("q", query);
+        params.put("q", mQuery);
 
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyymmdd");
 
@@ -179,7 +191,7 @@ public class SearchActivity extends AppCompatActivity implements FilterDialogFra
                 JSONArray articleJsonResults = null;
                 try {
                     articleJsonResults = response.getJSONObject("response").getJSONArray("docs");
-                    adapter.addAll(Article.fromJsonArray(articleJsonResults));
+                    articles.addAll(Article.fromJsonArray(articleJsonResults));
                     adapter.notifyDataSetChanged();
                 } catch (JSONException e) {
                     e.printStackTrace();

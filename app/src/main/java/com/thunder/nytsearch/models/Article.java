@@ -43,7 +43,7 @@ public class Article {
                 String thumnail = "";
                 JSONArray multimedia = jsonObject.getJSONArray("multimedia");
                 if (multimedia.length() > 0){
-                    JSONObject multimediaJson = multimedia.getJSONObject(0);
+                    JSONObject multimediaJson = multimedia.getJSONObject(1);
                     thumnail = "http://www.nytimes.com/" + multimediaJson.getString("url");
                 }
                 results.add(new Article(webUrl, headline, thumnail));
