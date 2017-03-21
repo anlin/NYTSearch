@@ -1,31 +1,19 @@
 package com.thunder.nytsearch.adapters;
 
 import android.content.Context;
-import android.content.Intent;
-import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.thunder.nytsearch.R;
-import com.thunder.nytsearch.activities.ArticleActiviy;
-import com.thunder.nytsearch.models.Article;
-
-import org.w3c.dom.Text;
+import com.thunder.nytsearch.models.Doc;
 
 import java.util.ArrayList;
-import java.util.List;
-
-import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
-import static com.thunder.nytsearch.R.id.ivThumbnail;
-import static com.thunder.nytsearch.R.id.tvHeadline;
-import static java.security.AccessController.getContext;
 
 /**
  * Created by anlinsquall on 17/3/17.
@@ -45,10 +33,10 @@ public class ArticleArrayAdapter extends RecyclerView.Adapter<ArticleArrayAdapte
         }
     }
 
-    private static ArrayList<Article> mArticles;
+    private static ArrayList<Doc> mArticles;
     private Context mContext;
 
-    public ArticleArrayAdapter(Context context, ArrayList<Article> articles) {
+    public ArticleArrayAdapter(Context context, ArrayList<Doc> articles) {
         mArticles = articles;
         mContext = context;
     }
@@ -70,14 +58,19 @@ public class ArticleArrayAdapter extends RecyclerView.Adapter<ArticleArrayAdapte
 
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, int position) {
-        Article article = mArticles.get(position);
+        Doc article = mArticles.get(position);
 
         TextView textView = viewHolder.tvHeadline;
-        textView.setText(article.getHeadline());
+        textView.setText(article.getHeadline().getMain());
 
         ImageView imageView = viewHolder.ivThumbnail;
-        if(!TextUtils.isEmpty(article.getThumbnail()))
-            Glide.with(mContext).load(article.getThumbnail()).into(imageView);
+        if(article.getMultimedia().size() > 0) {
+            if (!TextUtils.isEmpty(article.getMultimedia().get(0).getUrl())) {
+                String url = "http://www.nytimes.com/" +
+                        article.getMultimedia().get(0).getUrl();
+                Glide.with(mContext).load(url).into(imageView);
+            }
+        }
     }
 
     @Override

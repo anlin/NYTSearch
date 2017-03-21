@@ -15,7 +15,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -24,25 +23,21 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.AdapterView;
-import android.widget.GridView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
+import com.loopj.android.http.TextHttpResponseHandler;
 import com.thunder.nytsearch.R;
 import com.thunder.nytsearch.adapters.ArticleArrayAdapter;
 import com.thunder.nytsearch.adapters.EndlessRecyclerViewScrollListener;
-import com.thunder.nytsearch.adapters.EndlessScrollListener;
 import com.thunder.nytsearch.adapters.ItemClickSupport;
 import com.thunder.nytsearch.fragments.FilterDialogFragment;
-import com.thunder.nytsearch.models.Article;
+import com.thunder.nytsearch.models.ArticleSearchResponse;
+import com.thunder.nytsearch.models.Doc;
 import com.thunder.nytsearch.models.Filter;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -57,7 +52,7 @@ public class SearchActivity extends AppCompatActivity implements FilterDialogFra
 
     Filter currentFilter;
 
-    ArrayList<Article> articles;
+    ArrayList<Doc> articles;
     ArticleArrayAdapter adapter;
 
     String mQuery;
@@ -78,7 +73,7 @@ public class SearchActivity extends AppCompatActivity implements FilterDialogFra
 
     private void setupView() {
         rvArticles = (RecyclerView) findViewById(R.id.rvArticles);
-        articles = new ArrayList<Article>();
+        articles = new ArrayList<Doc>();
         adapter = new ArticleArrayAdapter(this, articles);
         rvArticles.setAdapter(adapter);
 
@@ -93,7 +88,7 @@ public class SearchActivity extends AppCompatActivity implements FilterDialogFra
             @Override
             public void onItemClicked(RecyclerView recyclerView, int position, View v) {
                 // get the article to display
-                Article article = articles.get(position);
+                Doc article = articles.get(position);
 
                 Bitmap bitmap = BitmapFactory.decodeResource(getResources()
                         , R.drawable.ic_action_share);
@@ -210,23 +205,20 @@ public class SearchActivity extends AppCompatActivity implements FilterDialogFra
             }
         }
 
-        client.get(url, params, new JsonHttpResponseHandler(){
+        client.get(url, params, new TextHttpResponseHandler() {
             @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                JSONArray articleJsonResults = null;
-                try {
-                    articleJsonResults = response.getJSONObject("response").getJSONArray("docs");
-                    articles.addAll(Article.fromJsonArray(articleJsonResults));
-                    adapter.notifyDataSetChanged();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                Log.d("DEBUG", articles.toString());
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+
             }
 
             @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                Log.d("DEBUG", errorResponse.toString());
+            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                Gson gson = new GsonBuilder().create();
+                ArticleSearchResponse articleSearchResponse = gson.fromJson(responseString, ArticleSearchResponse.class);
+                articles.addAll(articleSearchResponse.getResponse().getDocs());
+                adapter.notifyDataSetChanged();
+                Log.d("DEBUG", articleSearchResponse.toString());
+
             }
         });
     }
