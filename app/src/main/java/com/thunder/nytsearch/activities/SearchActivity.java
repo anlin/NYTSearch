@@ -90,9 +90,7 @@ public class SearchActivity extends AppCompatActivity implements FilterDialogFra
         rvArticles.setLayoutManager(gridLayoutManager);
 
         // hook up listener for click
-        ItemClickSupport.addTo(rvArticles).setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
-            @Override
-            public void onItemClicked(RecyclerView recyclerView, int position, View v) {
+        ItemClickSupport.addTo(rvArticles).setOnItemClickListener((v, position, recyclerView) -> {
                 // get the article to display
                 Doc article = articles.get(position);
 
@@ -120,7 +118,7 @@ public class SearchActivity extends AppCompatActivity implements FilterDialogFra
                 // and launch the desired Url with CustomTabsIntent.launchUrl()
                 customTabsIntent.launchUrl(SearchActivity.this, Uri.parse(url));
             }
-        });
+        );
 
         rvArticles.addOnScrollListener(new EndlessRecyclerViewScrollListener(gridLayoutManager) {
             @Override

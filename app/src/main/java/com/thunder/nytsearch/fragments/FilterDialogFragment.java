@@ -64,14 +64,11 @@ public class FilterDialogFragment extends DialogFragment implements DatePickerFr
         getDialog().setTitle(title);
         tvBeginDate = (TextView) view.findViewById(R.id.tvBeginDate);
         tvBeginDate.setText("Click to select a date.");
-        tvBeginDate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        tvBeginDate.setOnClickListener(v -> {
                 DatePickerFragment datePickerFragment = new DatePickerFragment();
                 datePickerFragment.setTargetFragment(FilterDialogFragment.this, 0);
                 datePickerFragment.show(getFragmentManager(), "datePickerDialog");
-            }
-        });
+            });
 
         spSortOrder = (Spinner) view.findViewById(R.id.spSortOrder);
         cbArts = (CheckBox) view.findViewById(R.id.cbArts);
@@ -79,9 +76,7 @@ public class FilterDialogFragment extends DialogFragment implements DatePickerFr
         cbSports = (CheckBox) view.findViewById(R.id.cbSports);
 
         btnSave = (Button) view.findViewById(R.id.btnSave);
-        btnSave.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        btnSave.setOnClickListener(v -> {
                 selectedFilter.isSports = cbSports.isChecked();
                 selectedFilter.sortOrderBy =spSortOrder.getSelectedItem().toString();
                 selectedFilter.isFashionSytles = cbFashionStyles.isChecked();
@@ -91,8 +86,7 @@ public class FilterDialogFragment extends DialogFragment implements DatePickerFr
                 FilterDialogListener listener = (FilterDialogListener) getActivity();
                 listener.onSaveFilterDialog(selectedFilter);
                 dismiss();
-            }
-        });
+            });
     }
 
     @Override
