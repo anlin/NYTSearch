@@ -1,11 +1,17 @@
 package com.thunder.nytsearch.activities;
 
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.customtabs.CustomTabsIntent;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -86,13 +92,32 @@ public class SearchActivity extends AppCompatActivity implements FilterDialogFra
         ItemClickSupport.addTo(rvArticles).setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
             @Override
             public void onItemClicked(RecyclerView recyclerView, int position, View v) {
-                Intent intent = new Intent(getApplicationContext(), ArticleActiviy.class);
                 // get the article to display
                 Article article = articles.get(position);
 
-                intent.putExtra("url", article.getWebUrl());
+                Bitmap bitmap = BitmapFactory.decodeResource(getResources()
+                        , R.drawable.ic_action_share);
 
-                startActivity(intent);
+                Intent intent = new Intent(Intent.ACTION_SEND);
+                intent.setType("text/plain");
+                intent.putExtra(Intent.EXTRA_TEXT, article.getWebUrl());
+
+                int requestCode = 100;
+                PendingIntent pendingIntent = PendingIntent.getActivity(SearchActivity.this,
+                        requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+                // Use a CustomTabsIntent.Builder to configure CustomTabsIntent.
+                String url = article.getWebUrl();
+                CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+                // set toolbar color and/or setting custom actions before invoking build()
+                builder.setToolbarColor(ContextCompat.getColor(SearchActivity.this, R.color.colorPrimary));
+                // share button
+                builder.addDefaultShareMenuItem();
+                builder.setActionButton(bitmap, "Share Link", pendingIntent, true);
+                // Once ready, call CustomTabsIntent.Builder.build() to create a CustomTabsIntent
+                CustomTabsIntent customTabsIntent = builder.build();
+                // and launch the desired Url with CustomTabsIntent.launchUrl()
+                customTabsIntent.launchUrl(SearchActivity.this, Uri.parse(url));
             }
         });
 
@@ -160,7 +185,7 @@ public class SearchActivity extends AppCompatActivity implements FilterDialogFra
         AsyncHttpClient client = new AsyncHttpClient();
 
         RequestParams params = new RequestParams();
-        params.put("api-key","YOUR_API_HERE");
+        params.put("api-key","YOUR_API_KEY");
         params.put("page", offset);
         params.put("q", mQuery);
 
