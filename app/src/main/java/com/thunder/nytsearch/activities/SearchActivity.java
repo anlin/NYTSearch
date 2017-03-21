@@ -38,6 +38,7 @@ import com.thunder.nytsearch.fragments.FilterDialogFragment;
 import com.thunder.nytsearch.models.ArticleSearchResponse;
 import com.thunder.nytsearch.models.Doc;
 import com.thunder.nytsearch.models.Filter;
+import com.thunder.nytsearch.retrofit.NYTArticleSearchApiEndPoint;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -45,6 +46,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class SearchActivity extends AppCompatActivity implements FilterDialogFragment.FilterDialogListener {
 
@@ -176,13 +182,11 @@ public class SearchActivity extends AppCompatActivity implements FilterDialogFra
             return;
         }
 
-        String url = "https://api.nytimes.com/svc/search/v2/articlesearch.json";
-        AsyncHttpClient client = new AsyncHttpClient();
-
-        RequestParams params = new RequestParams();
-        params.put("api-key","YOUR_API_KEY");
-        params.put("page", offset);
-        params.put("q", mQuery);
+        final String baseUrl = "https://api.nytimes.com/";
+        String apiKey = "YOUR_API_KEY";
+        String beginDate = null;
+        String sortOrderBy =null;
+        String fq = null;
 
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyymmdd");
 
@@ -191,9 +195,9 @@ public class SearchActivity extends AppCompatActivity implements FilterDialogFra
         // fq=news_deck:("" "")
         if(currentFilter!=null){
             if(currentFilter.beginDate!=null)
-                params.put("begin_date",simpleDateFormat.format(currentFilter.beginDate));
+                beginDate = simpleDateFormat.format(currentFilter.beginDate);
             if(currentFilter.sortOrderBy!=null)
-                params.put("sort",currentFilter.sortOrderBy);
+                sortOrderBy = currentFilter.sortOrderBy;
             if(currentFilter.isSports || currentFilter.isFashionSytles || currentFilter.isArts) {
                 if (currentFilter.isArts)
                     newsDeskArray.add("\"Arts\"");
@@ -201,23 +205,31 @@ public class SearchActivity extends AppCompatActivity implements FilterDialogFra
                     newsDeskArray.add("\"Fashion & Style\"");
                 if (currentFilter.isSports)
                     newsDeskArray.add("\"Sports\"");
-                params.put("fq", String.format("\"news_deck:(%s)\"", android.text.TextUtils.join(" ",newsDeskArray )));
+                fq = String.format("\"news_deck:(%s)\"", android.text.TextUtils.join(" ",newsDeskArray ));
             }
         }
 
-        client.get(url, params, new TextHttpResponseHandler() {
-            @Override
-            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+        Retrofit retrofit = new Retrofit.Builder().baseUrl(baseUrl)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
 
-            }
+        NYTArticleSearchApiEndPoint apiEndPoint = retrofit
+                .create(NYTArticleSearchApiEndPoint.class);
+
+        Call<ArticleSearchResponse> call = apiEndPoint.getArticles(apiKey, offset, mQuery,
+                beginDate, sortOrderBy,fq);
+        call.enqueue(new Callback<ArticleSearchResponse>(){
 
             @Override
-            public void onSuccess(int statusCode, Header[] headers, String responseString) {
-                Gson gson = new GsonBuilder().create();
-                ArticleSearchResponse articleSearchResponse = gson.fromJson(responseString, ArticleSearchResponse.class);
+            public void onResponse(Call<ArticleSearchResponse> call, Response<ArticleSearchResponse> response) {
+                ArticleSearchResponse articleSearchResponse = response.body();
                 articles.addAll(articleSearchResponse.getResponse().getDocs());
                 adapter.notifyDataSetChanged();
                 Log.d("DEBUG", articleSearchResponse.toString());
+            }
+
+            @Override
+            public void onFailure(Call<ArticleSearchResponse> call, Throwable t) {
 
             }
         });
